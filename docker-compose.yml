@@ -1,0 +1,40 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: jobs24-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Jyoti100@
+      MYSQL_DATABASE: jobs24
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pJyoti100@"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./demo/demo
+      dockerfile: DockerFile
+    container_name: jobs24-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./JOBS24 FRONTEND/jobs24-frontend
+      dockerfile: DockerFile
+    container_name: jobs24-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
