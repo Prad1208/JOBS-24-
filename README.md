@@ -1,21 +1,78 @@
-# JOBS 24 – Full Stack Cloud-Native Job Tracker Platform
+# 💼 JOBS 24
 
-## Dashboard
+> A full-stack job application tracking platform built with React, Spring Boot, MySQL, and Docker.
 
-![Dashboard](screenshots/dashboard.png)
+JOBS 24 helps users organize and track their job applications in one place. 
+Users can add, update, delete, search, and filter job applications based on their current application status.
 
-## Add Job Form
+---
+## 🚀 Features
 
-![Add Job](screenshots/add-job.png)
+- ➕ Add new job applications
+- ✏️ Update existing applications
+- 🗑️ Delete job applications
+- 🔍 Search jobs
+- 🎯 Filter applications by status
+- 📅 Track application dates
+- 🏷️ Application status management
+- 🌙 Dark mode UI
+- 🔄 REST API integration
+- 🗄️ MySQL database persistence
+- 🐳 Docker support
+- 📦 Docker Compose setup
+- ⚡ React + Spring Boot full-stack architecture
 
-## Job List
+---
 
-![Job List](screenshots/jobs-list.png)
+## 🛠️ Tech Stack
 
-## Tech Stack
+### Frontend
 
 - React
+- Vite
+- JavaScript
+- HTML5
+- CSS3
+
+### Backend
+
+- Java 21
 - Spring Boot
-- MySQL
-- JPA/Hibernate
+- Spring Web
+- Spring Data JPA
+- Hibernate
 - REST APIs
+
+### Database
+
+- MySQL
+
+### DevOps
+
+- Docker
+- Docker Compose
+- Git & GitHub
+
+---
+
+## 🏗️ Architecture
+
+```text
+                ┌─────────────────────┐
+                │      React UI       │
+                │      Vite           │
+                └──────────┬──────────┘
+                           │
+                           │ REST API
+                           ▼
+                ┌─────────────────────┐
+                │    Spring Boot      │
+                │     Backend         │
+                └──────────┬──────────┘
+                           │
+                           │ JPA / Hibernate
+                           ▼
+                ┌─────────────────────┐
+                │       MySQL         │
+                │      Database       │
+                └─────────────────────┘

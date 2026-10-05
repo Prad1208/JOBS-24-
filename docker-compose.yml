@@ -33,6 +33,9 @@ services:
     container_name: jobs24-frontend
     ports:
       - "5173:5173"
+    volumes:
+      - "./JOBS24 FRONTEND/jobs24-frontend:/app"
+      - /app/node_modules
     depends_on:
       - backend
 
