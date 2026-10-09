@@ -1,6 +1,6 @@
 # 💼 JOBS 24
 
-> A full-stack job application tracking platform built with React, Spring Boot, MySQL, and Docker.
+> A full-stack Job application tracking platform built with React, Spring Boot, MySQL, and Docker deployed.
 
 JOBS 24 helps users organize and track their job applications in one place. 
 Users can add, update, delete, search, and filter job applications based on their current application status.
