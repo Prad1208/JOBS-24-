@@ -1,16 +1,62 @@
-# React + Vite
+# ⚛️ JOBS 24 - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Modern React (Vite) interface for the Jobs 24 Applicant Tracking System.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+- 📊 **Real-time Dashboard**: Live application statistics (Total, Applied, Interview, Offers).
+- ➕ **Job Form**: Add and update job applications with company, role, location, salary, status, dates, and notes.
+- 📋 **Application Table**: Interactive table with color-coded status badges and quick action buttons.
+- 🔍 **Search & Filter**: Instant search by company/role and filtering by recruitment pipeline stage.
+- 🌙 **Dark Mode**: Theme toggle with dark & light styling powered by Bootstrap 5.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React 19**
+- **Vite 8**
+- **Axios** (API requests to Spring Boot on `http://localhost:8080/api/jobs`)
+- **Bootstrap 5** (Responsive UI components & styling)
+
+---
+
+## 📁 Directory Structure
+
+```text
+src/
+├── assets/          # Images and static assets
+├── components/      # Reusable UI components
+│   ├── Dashboard.jsx
+│   ├── JobForm.jsx
+│   ├── JobList.jsx
+│   ├── Navbar.jsx
+│   ├── SearchFilter.jsx
+│   ├── StatsCards.jsx
+│   └── StatusBadge.jsx
+├── pages/           # Page containers
+│   └── Home.jsx
+├── services/        # Axios API client
+│   └── jobService.js
+├── App.jsx
+└── main.jsx
+```
+
+---
+
+## ⚡ Running the Frontend
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start Vite development server
+npm run dev
+
+# 3. Build for production
+npm run build
+```
+
+Local development runs at: **`http://localhost:5173`**
