@@ -5,9 +5,9 @@ function JobForm({
     refreshJobs,
     selectedJob,
     setSelectedJob,
-    darkMode
+    showForm,
+    setShowForm
 }) {
-
     const emptyJob = {
         company: "",
         role: "",
@@ -19,10 +19,12 @@ function JobForm({
     };
 
     const [job, setJob] = useState(emptyJob);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (selectedJob) {
             setJob(selectedJob);
+            if (setShowForm) setShowForm(true);
         } else {
             setJob(emptyJob);
         }
@@ -30,7 +32,6 @@ function JobForm({
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         setJob((prev) => ({
             ...prev,
             [name]: value
@@ -39,229 +40,190 @@ function JobForm({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        console.log("Submitting Job:", job);
+        setLoading(true);
 
         try {
-
-            let response;
-
             if (selectedJob) {
-
-                response = await updateJob(selectedJob.id, job);
-
-                console.log("Update Response:", response.data);
-
-                alert("Job Updated Successfully!");
-
+                await updateJob(selectedJob.id, job);
+                alert("✨ Job application updated successfully!");
                 setSelectedJob(null);
-
             } else {
-
-                response = await addJob(job);
-
-                console.log("Add Response:", response.data);
-
-                alert("Job Added Successfully!");
+                await addJob(job);
+                alert("✨ Job application added successfully!");
             }
 
             setJob(emptyJob);
-
+            if (setShowForm) setShowForm(false);
             refreshJobs();
-
         } catch (error) {
-
-            console.error("FULL ERROR:", error);
-
-            if (error.response) {
-
-                console.log("Status:", error.response.status);
-                console.log("Data:", error.response.data);
-
-                alert(
-                    `Backend Error ${error.response.status}\n\n${JSON.stringify(error.response.data)}`
-                );
-
-            } else if (error.request) {
-
-                console.log("No response received:", error.request);
-
-                alert("Frontend reached backend URL, but no response was received.");
-
-            } else {
-
-                console.log("Error Message:", error.message);
-
-                alert(error.message);
-            }
+            console.error("Submission Error:", error);
+            alert("Failed to save application. Please verify backend is running.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    if (!showForm && !selectedJob) {
+        return null;
+    }
+
     return (
         <div className="container mt-4">
-
-            <div
-                className={`card shadow ${
-                    darkMode ? "bg-dark text-light" : ""
-                }`}
-            >
-
-                <div className="card-header bg-primary text-white">
-                    <h4>
-                        {selectedJob ? "Edit Job" : "Add Job"}
-                    </h4>
+            <div className="app-card overflow-hidden">
+                <div className="p-3 px-4 d-flex justify-content-between align-items-center" style={{
+                    background: "var(--primary-gradient)",
+                    color: "#ffffff"
+                }}>
+                    <div className="d-flex align-items-center gap-2">
+                        <span className="fs-5">{selectedJob ? "✏️" : "➕"}</span>
+                        <h5 className="mb-0 fw-bold">
+                            {selectedJob ? "Edit Application" : "New Application"}
+                        </h5>
+                    </div>
+                    <button
+                        type="button"
+                        className="btn-close btn-close-white"
+                        aria-label="Close"
+                        onClick={() => {
+                            setSelectedJob(null);
+                            setJob(emptyJob);
+                            if (setShowForm) setShowForm(false);
+                        }}
+                    ></button>
                 </div>
 
-                <div className="card-body">
-
+                <div className="p-4">
                     <form onSubmit={handleSubmit}>
-
-                        <div className="row">
-
-                            <div className="col-md-6 mb-3">
-                                <label>Company</label>
+                        <div className="row g-3">
+                            <div className="col-md-6">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Company Name *
+                                </label>
                                 <input
                                     type="text"
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-control custom-input"
                                     name="company"
+                                    placeholder="e.g. Google, Amazon, Microsoft"
                                     value={job.company}
                                     onChange={handleChange}
                                     required
                                 />
                             </div>
 
-                            <div className="col-md-6 mb-3">
-                                <label>Role</label>
+                            <div className="col-md-6">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Role / Title *
+                                </label>
                                 <input
                                     type="text"
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-control custom-input"
                                     name="role"
+                                    placeholder="e.g. Software Development Engineer (SDE)"
                                     value={job.role}
                                     onChange={handleChange}
                                     required
                                 />
                             </div>
 
-                            <div className="col-md-6 mb-3">
-                                <label>Location</label>
+                            <div className="col-md-4">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Location
+                                </label>
                                 <input
                                     type="text"
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-control custom-input"
                                     name="location"
+                                    placeholder="e.g. Bangalore, Remote, Hybrid"
                                     value={job.location}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
 
-                            <div className="col-md-6 mb-3">
-                                <label>Salary</label>
+                            <div className="col-md-4">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Salary / Compensation
+                                </label>
                                 <input
                                     type="text"
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-control custom-input"
                                     name="salary"
+                                    placeholder="e.g. 24 LPA or $120,000"
                                     value={job.salary}
                                     onChange={handleChange}
                                 />
                             </div>
 
-                            <div className="col-md-6 mb-3">
-                                <label>Status</label>
-
+                            <div className="col-md-4">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Application Stage
+                                </label>
                                 <select
-                                    className={`form-select ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-select custom-input"
                                     name="status"
                                     value={job.status}
                                     onChange={handleChange}
                                 >
-                                    <option value="APPLIED">APPLIED</option>
-                                    <option value="OA">OA</option>
-                                    <option value="INTERVIEW">INTERVIEW</option>
-                                    <option value="HR">HR</option>
-                                    <option value="OFFER">OFFER</option>
-                                    <option value="REJECTED">REJECTED</option>
+                                    <option value="APPLIED">📝 APPLIED</option>
+                                    <option value="OA">⚡ OA (Online Assessment)</option>
+                                    <option value="INTERVIEW">🎯 INTERVIEW ROUND</option>
+                                    <option value="HR">🤝 HR ROUND</option>
+                                    <option value="OFFER">🏆 OFFER RECEIVED</option>
+                                    <option value="REJECTED">❌ REJECTED</option>
                                 </select>
                             </div>
 
-                            <div className="col-md-6 mb-3">
-                                <label>Applied Date</label>
+                            <div className="col-md-6">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Date Applied
+                                </label>
                                 <input
                                     type="date"
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
+                                    className="form-control custom-input"
                                     name="appliedDate"
                                     value={job.appliedDate || ""}
                                     onChange={handleChange}
                                 />
                             </div>
 
-                            <div className="col-12 mb-3">
-                                <label>Notes</label>
-
-                                <textarea
-                                    className={`form-control ${
-                                        darkMode
-                                            ? "bg-secondary text-light border-light"
-                                            : ""
-                                    }`}
-                                    rows="3"
+                            <div className="col-md-6">
+                                <label className="form-label small fw-semibold" style={{ color: "var(--text-muted)" }}>
+                                    Notes / Referral / Links
+                                </label>
+                                <input
+                                    type="text"
+                                    className="form-control custom-input"
                                     name="notes"
+                                    placeholder="e.g. Referred by John Doe, portal link..."
                                     value={job.notes}
                                     onChange={handleChange}
-                                ></textarea>
+                                />
                             </div>
-
                         </div>
 
-                        <button
-                            type="submit"
-                            className="btn btn-success"
-                        >
-                            {selectedJob ? "Update Job" : "Add Job"}
-                        </button>
-
-                        {selectedJob && (
+                        <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top" style={{ borderColor: "var(--border-color)" }}>
                             <button
                                 type="button"
-                                className="btn btn-secondary ms-2"
+                                className="btn btn-outline-secondary"
+                                style={{ borderRadius: "10px", padding: "0.5rem 1.25rem", fontWeight: "600" }}
                                 onClick={() => {
                                     setSelectedJob(null);
                                     setJob(emptyJob);
+                                    if (setShowForm) setShowForm(false);
                                 }}
                             >
                                 Cancel
                             </button>
-                        )}
-
+                            <button
+                                type="submit"
+                                className="btn btn-gradient d-flex align-items-center gap-2"
+                                disabled={loading}
+                            >
+                                {loading ? "Saving..." : selectedJob ? "Update Application" : "Save Application"}
+                            </button>
+                        </div>
                     </form>
-
                 </div>
-
             </div>
-
         </div>
     );
 }

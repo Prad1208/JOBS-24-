@@ -1,27 +1,17 @@
 function StatusBadge({ status }) {
+    const s = (status || "").toUpperCase();
+    let badgeClass = "status-applied";
 
-    let color = "secondary";
-
-
-    if(status === "APPLIED")
-        color="primary";
-
-    else if(status==="INTERVIEW")
-        color="warning";
-
-    else if(status==="OFFER")
-        color="success";
-
-    else if(status==="REJECTED")
-        color="danger";
-
+    if (s === "OA") badgeClass = "status-oa";
+    else if (s === "INTERVIEW") badgeClass = "status-interview";
+    else if (s === "HR") badgeClass = "status-hr";
+    else if (s === "OFFER") badgeClass = "status-offer";
+    else if (s === "REJECTED") badgeClass = "status-rejected";
 
     return (
-
-        <span className={`badge bg-${color}`}>
+        <span className={`status-pill ${badgeClass}`}>
             {status}
         </span>
-
     );
 }
 
