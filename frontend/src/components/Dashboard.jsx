@@ -1,7 +1,7 @@
 function Dashboard({ jobs = [] }) {
     const total = jobs.length;
     const applied = jobs.filter(j => j.status === "APPLIED").length;
-    const interview = jobs.filter(j => j.status === "INTERVIEW" || j.status === "OA" || j.status === "HR").length;
+    const interview = jobs.filter(j => j.status === "INTERVIEW" || j.status === "OA" || j.status === "HR" || j.status === "SHORTLISTED").length;
     const offers = jobs.filter(j => j.status === "OFFER").length;
 
     const cards = [
@@ -27,7 +27,7 @@ function Dashboard({ jobs = [] }) {
             icon: "🎯",
             accentBg: "rgba(245, 158, 11, 0.14)",
             textColor: "#d97706",
-            subtitle: "OA / Tech & HR Rounds"
+            subtitle: "Shortlisted / OA / Tech & HR Rounds"
         },
         {
             title: "Offers Received",

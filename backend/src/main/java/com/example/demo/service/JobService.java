@@ -47,6 +47,14 @@ public class JobService {
         return jobRepository.save(existingJob);
     }
 
+    // UPDATE job status (Status tracking workflow)
+    public Job updateJobStatus(Long id, Job.Status status) {
+        Job existingJob = jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found with id: " + id));
+        existingJob.setStatus(status);
+        return jobRepository.save(existingJob);
+    }
+
     // DELETE job
     public void deleteJob(Long id) {
         if (!jobRepository.existsById(id)) {

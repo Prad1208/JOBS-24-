@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { getJobs } from "../services/jobService";
+import { useAuth } from "../context/AuthContext";
 
 import Navbar from "../components/Navbar";
 import Dashboard from "../components/Dashboard";
 import JobForm from "../components/JobForm";
 import JobList from "../components/JobList";
 import SearchFilter from "../components/SearchFilter";
+import AiAssistantModal from "../components/AiAssistantModal";
 
 function Home() {
+    const { user, isAuthenticated, isRecruiter, loginDemo, openAuthModal } = useAuth();
     const [jobs, setJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
     const [search, setSearch] = useState("");
@@ -50,6 +53,103 @@ function Home() {
         <div style={{ minHeight: "100vh" }}>
             <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
+            {/* Quick Demo & Role Bar */}
+            <div
+                style={{
+                    backgroundColor: "var(--bg-elevated)",
+                    borderBottom: "1px solid var(--border-color)",
+                    padding: "0.55rem 0",
+                    fontSize: "0.83rem",
+                }}
+            >
+                <div className="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    {isAuthenticated ? (
+                        <div className="d-flex align-items-center gap-2">
+                            <span>{isRecruiter ? "💼" : "👤"}</span>
+                            <span style={{ color: "var(--text-main)" }}>
+                                Active Role: <strong>{user.fullName}</strong> ({isRecruiter ? "Recruiter / Hiring Lead" : "Job Seeker"})
+                            </span>
+                            <span className="text-muted">•</span>
+                            <span className="text-muted" style={{ fontSize: "0.78rem" }}>
+                                {isRecruiter
+                                    ? "Full authority to post openings, review applicants & update candidate stages."
+                                    : "Full access to track status, parse JDs & generate AI Cover Letters, Outreach & Interview prep."}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="d-flex align-items-center gap-2">
+                            <span>🚀</span>
+                            <span style={{ color: "var(--text-main)", fontWeight: 500 }}>
+                                Live ATS & AI Assistant Demo:
+                            </span>
+                            <span className="text-muted">
+                                Test JWT authentication with roles or browse freely.
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="d-flex align-items-center gap-2">
+                        {isAuthenticated ? (
+                            <button
+                                className="btn btn-sm"
+                                onClick={() => loginDemo(isRecruiter ? "seeker" : "recruiter")}
+                                style={{
+                                    backgroundColor: "var(--bg-surface)",
+                                    border: "1px solid var(--border-color)",
+                                    color: "var(--text-main)",
+                                    borderRadius: "15px",
+                                    padding: "0.2rem 0.65rem",
+                                    fontSize: "0.78rem",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                🔄 Switch to {isRecruiter ? "Job Seeker Role" : "Recruiter Role"}
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    className="btn btn-sm"
+                                    onClick={() => loginDemo("seeker")}
+                                    style={{
+                                        backgroundColor: "#eff6ff",
+                                        border: "1px solid #bfdbfe",
+                                        color: "#1d4ed8",
+                                        borderRadius: "15px",
+                                        padding: "0.2rem 0.65rem",
+                                        fontSize: "0.78rem",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    ⚡ 1-Click Job Seeker
+                                </button>
+                                <button
+                                    className="btn btn-sm"
+                                    onClick={() => loginDemo("recruiter")}
+                                    style={{
+                                        backgroundColor: "#f0fdf4",
+                                        border: "1px solid #bbf7d0",
+                                        color: "#15803d",
+                                        borderRadius: "15px",
+                                        padding: "0.2rem 0.65rem",
+                                        fontSize: "0.78rem",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    ⚡ 1-Click Recruiter
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-link p-0 text-decoration-none"
+                                    onClick={() => openAuthModal("register")}
+                                    style={{ fontSize: "0.78rem", fontWeight: 600 }}
+                                >
+                                    Register Free
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             <main className="pb-5">
                 <Dashboard jobs={jobs} />
 
@@ -80,53 +180,12 @@ function Home() {
                 />
             </main>
 
-            {/* AI Assistant Modal Placeholder */}
+            {/* AI Assistant Modal */}
             {selectedAiJob && (
-                <div
-                    className="modal show d-block"
-                    tabIndex="-1"
-                    style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
-                >
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content app-card border-0" style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-main)" }}>
-                            <div className="modal-header border-bottom" style={{ borderColor: "var(--border-color)" }}>
-                                <div className="d-flex align-items-center gap-2">
-                                    <span className="fs-5">✨</span>
-                                    <h5 className="modal-title fw-bold">
-                                        AI Assistant for {selectedAiJob.company}
-                                    </h5>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setSelectedAiJob(null)}
-                                ></button>
-                            </div>
-                            <div className="modal-body p-4">
-                                <p className="small mb-3" style={{ color: "var(--text-muted)" }}>
-                                    Role: <strong>{selectedAiJob.role}</strong> | Status: <strong>{selectedAiJob.status}</strong>
-                                </p>
-                                <div className="p-3 rounded-3 mb-3" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-color)" }}>
-                                    <h6 className="fw-bold mb-2">🚀 Coming Up in Phase 2:</h6>
-                                    <ul className="small mb-0 ps-3" style={{ color: "var(--text-muted)" }}>
-                                        <li>Generate customized Cover Letter for {selectedAiJob.company}</li>
-                                        <li>Generate cold LinkedIn Referral message</li>
-                                        <li>Predict top interview questions for {selectedAiJob.role}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className="modal-footer border-top" style={{ borderColor: "var(--border-color)" }}>
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={() => setSelectedAiJob(null)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <AiAssistantModal
+                    job={selectedAiJob}
+                    onClose={() => setSelectedAiJob(null)}
+                />
             )}
         </div>
     );

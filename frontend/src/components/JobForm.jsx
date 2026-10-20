@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { addJob, updateJob } from "../services/jobService";
+import { parseJobDescription } from "../services/aiService";
 
 function JobForm({
     refreshJobs,
@@ -20,6 +21,9 @@ function JobForm({
 
     const [job, setJob] = useState(emptyJob);
     const [loading, setLoading] = useState(false);
+    const [rawJd, setRawJd] = useState("");
+    const [parsingJd, setParsingJd] = useState(false);
+    const [showAiBox, setShowAiBox] = useState(false);
 
     useEffect(() => {
         if (selectedJob) {
@@ -63,6 +67,34 @@ function JobForm({
         }
     };
 
+    const handleAutoFill = async () => {
+        if (!rawJd.trim()) {
+            alert("Please paste some job description or LinkedIn post text first.");
+            return;
+        }
+        setParsingJd(true);
+        try {
+            const res = await parseJobDescription(rawJd);
+            const data = res.data || {};
+            setJob((prev) => ({
+                ...prev,
+                company: data.company || prev.company,
+                role: data.role || prev.role,
+                location: data.location || prev.location,
+                salary: data.salary || prev.salary,
+                notes: data.notes || prev.notes
+            }));
+            setShowAiBox(false);
+            setRawJd("");
+            alert("✨ Form auto-filled by AI! Please review details below.");
+        } catch (err) {
+            console.error("AI Auto-fill error:", err);
+            alert("Failed to auto-fill. Please check if backend is running.");
+        } finally {
+            setParsingJd(false);
+        }
+    };
+
     if (!showForm && !selectedJob) {
         return null;
     }
@@ -80,19 +112,62 @@ function JobForm({
                             {selectedJob ? "Edit Application" : "New Application"}
                         </h5>
                     </div>
-                    <button
-                        type="button"
-                        className="btn-close btn-close-white"
-                        aria-label="Close"
-                        onClick={() => {
-                            setSelectedJob(null);
-                            setJob(emptyJob);
-                            if (setShowForm) setShowForm(false);
-                        }}
-                    ></button>
+                    <div className="d-flex align-items-center gap-2">
+                        {!selectedJob && (
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-light py-1 px-3 d-flex align-items-center gap-1"
+                                style={{ borderRadius: "20px", fontWeight: "600", fontSize: "0.78rem" }}
+                                onClick={() => setShowAiBox(!showAiBox)}
+                            >
+                                ✨ {showAiBox ? "Hide AI Paste" : "AI Auto-Fill"}
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            className="btn-close btn-close-white"
+                            aria-label="Close"
+                            onClick={() => {
+                                setSelectedJob(null);
+                                setJob(emptyJob);
+                                if (setShowForm) setShowForm(false);
+                            }}
+                        ></button>
+                    </div>
                 </div>
 
                 <div className="p-4">
+                    {/* Collapsible AI Auto-Fill Box */}
+                    {showAiBox && !selectedJob && (
+                        <div className="p-3 rounded-3 mb-4" style={{
+                            backgroundColor: "var(--bg-elevated)",
+                            border: "1px dashed var(--primary-accent)"
+                        }}>
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <label className="form-label small fw-bold mb-0 text-primary d-flex align-items-center gap-1">
+                                    <span>🤖</span> Paste Job Description or LinkedIn Text to Auto-Fill:
+                                </label>
+                            </div>
+                            <textarea
+                                className="form-control custom-input mb-2"
+                                rows="3"
+                                placeholder="Paste raw text here... (e.g. 'Amazon is looking for a Software Development Engineer in Bangalore. Package 35 LPA...')"
+                                value={rawJd}
+                                onChange={(e) => setRawJd(e.target.value)}
+                            ></textarea>
+                            <div className="d-flex justify-content-end">
+                                <button
+                                    type="button"
+                                    className="btn btn-gradient btn-sm d-flex align-items-center gap-2"
+                                    onClick={handleAutoFill}
+                                    disabled={parsingJd}
+                                >
+                                    {parsingJd ? "⚡ Extracting..." : "⚡ Auto-Fill Form with AI"}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit}>
                         <div className="row g-3">
                             <div className="col-md-6">
@@ -164,6 +239,7 @@ function JobForm({
                                     onChange={handleChange}
                                 >
                                     <option value="APPLIED">📝 APPLIED</option>
+                                    <option value="SHORTLISTED">🌟 SHORTLISTED</option>
                                     <option value="OA">⚡ OA (Online Assessment)</option>
                                     <option value="INTERVIEW">🎯 INTERVIEW ROUND</option>
                                     <option value="HR">🤝 HR ROUND</option>

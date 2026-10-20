@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://localhost:5174"})
+@CrossOrigin(originPatterns = "*")
 @RestController
 @RequestMapping("/api/jobs")
 public class JobController {
@@ -29,6 +29,10 @@ public class JobController {
     @PutMapping("/{id}")
     public ResponseEntity<Job> updateJob(@PathVariable Long id, @RequestBody Job job) {
         return ResponseEntity.ok(jobService.updateJob(id, job));
+    }
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Job> updateJobStatus(@PathVariable Long id, @RequestParam Job.Status status) {
+        return ResponseEntity.ok(jobService.updateJobStatus(id, status));
     }
     @GetMapping("/stats")
     public Map<String, Long> getJobStats() {

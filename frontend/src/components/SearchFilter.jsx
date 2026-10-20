@@ -1,3 +1,6 @@
+import React from "react";
+import { useAuth } from "../context/AuthContext";
+
 function SearchFilter({
     search,
     setSearch,
@@ -7,6 +10,8 @@ function SearchFilter({
     showForm,
     setShowForm
 }) {
+    const { isRecruiter } = useAuth();
+
     return (
         <div className="container mt-4">
             <div className="app-card p-3">
@@ -42,6 +47,7 @@ function SearchFilter({
                         >
                             <option value="">🎯 All Stages (Pipeline)</option>
                             <option value="APPLIED">📝 Applied</option>
+                            <option value="SHORTLISTED">🌟 Shortlisted</option>
                             <option value="OA">⚡ Online Assessment (OA)</option>
                             <option value="INTERVIEW">🎯 Interview Round</option>
                             <option value="HR">🤝 HR Round</option>
@@ -50,14 +56,20 @@ function SearchFilter({
                         </select>
                     </div>
 
-                    {/* Add Application Button */}
+                    {/* Add Application / Post Opening Button */}
                     <div className="col-12 col-md-3 d-flex justify-content-md-end">
                         <button
                             type="button"
                             className="btn btn-gradient w-100 w-md-auto d-flex align-items-center justify-content-center gap-2"
                             onClick={() => setShowForm(!showForm)}
                         >
-                            <span>{showForm ? "✕ Close Form" : "➕ Add Application"}</span>
+                            <span>
+                                {showForm
+                                    ? "✕ Close Form"
+                                    : isRecruiter
+                                    ? "💼 Post Job Opening"
+                                    : "➕ Track Application"}
+                            </span>
                         </button>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { deleteJob } from "../services/jobService";
+import { deleteJob, updateJobStatus } from "../services/jobService";
 import StatusBadge from "./StatusBadge";
 
 function JobList({
@@ -8,6 +8,16 @@ function JobList({
     setShowForm,
     onOpenAiModal
 }) {
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            await updateJobStatus(id, newStatus);
+            refreshJobs();
+        } catch (error) {
+            console.error("Status Update Error:", error);
+            alert("Failed to update status.");
+        }
+    };
+
     const handleDelete = async (id, company) => {
         const confirmDelete = window.confirm(
             `Are you sure you want to delete the application for "${company}"?`
@@ -119,9 +129,34 @@ function JobList({
                                                 </span>
                                             </td>
 
-                                            {/* Status Badge */}
+                                            {/* Status Badge & Quick Transition */}
                                             <td>
-                                                <StatusBadge status={job.status} />
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <StatusBadge status={job.status} />
+                                                    <select
+                                                        className="form-select form-select-sm border-0 py-0 px-1"
+                                                        style={{
+                                                            width: "auto",
+                                                            fontSize: "0.75rem",
+                                                            backgroundColor: "var(--bg-elevated)",
+                                                            color: "var(--text-muted)",
+                                                            borderRadius: "6px",
+                                                            cursor: "pointer",
+                                                            height: "26px"
+                                                        }}
+                                                        value={job.status}
+                                                        onChange={(e) => handleStatusChange(job.id, e.target.value)}
+                                                        title="Advance or change application stage"
+                                                    >
+                                                        <option value="APPLIED">📝 Applied</option>
+                                                        <option value="SHORTLISTED">🌟 Shortlisted</option>
+                                                        <option value="OA">⚡ OA</option>
+                                                        <option value="INTERVIEW">🎯 Interview</option>
+                                                        <option value="HR">🤝 HR Round</option>
+                                                        <option value="OFFER">🏆 Offer</option>
+                                                        <option value="REJECTED">❌ Rejected</option>
+                                                    </select>
+                                                </div>
                                             </td>
 
                                             {/* Date Applied */}

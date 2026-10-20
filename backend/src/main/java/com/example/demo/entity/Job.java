@@ -24,6 +24,7 @@ public class Job {
 
     public enum Status {
         APPLIED,
+        SHORTLISTED,
         OA,
         INTERVIEW,
         HR,
@@ -31,7 +32,27 @@ public class Job {
         REJECTED
     }
 
-    // Getters
+    public Job() {}
+
+    public Job(String role, String company, String location, String notes, String salary, Status status) {
+        this.role = role;
+        this.company = company;
+        this.location = location;
+        this.notes = notes;
+        this.salary = salary;
+        this.status = status;
+        this.appliedDate = LocalDate.now();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.appliedDate == null) {
+            this.appliedDate = LocalDate.now();
+        }
+        if (this.status == null) {
+            this.status = Status.APPLIED;
+        }
+    }
     public Long getId() {
         return id;
     }
